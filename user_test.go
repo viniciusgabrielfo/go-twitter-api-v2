@@ -1,17 +1,16 @@
-package twitter_test
+package twitter
 
 import (
-	"go-twitter-api-v2/twitter"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetSingleUserByID(t *testing.T) {
-	twitterClient := twitter.NewTwitterApi(BEARER_TOKEN)
-	user, err := twitterClient.GetSingleUserByID("1592725891")
+	twitterClient := NewClient(BEARER_TOKEN)
+	user, err := twitterClient.GetSingleUserByID("1592725891", QueryParams{})
 
-	expectedUser := &twitter.User{
+	expectedUser := &User{
 		ID:       "1592725891",
 		Name:     "elfo.go",
 		Username: "velfo",
@@ -22,10 +21,10 @@ func TestGetSingleUserByID(t *testing.T) {
 }
 
 func TestGetMultipleUsersByID(t *testing.T) {
-	twitterClient := twitter.NewTwitterApi(BEARER_TOKEN)
+	twitterClient := NewClient(BEARER_TOKEN)
 	users, err := twitterClient.GetMultipleUsersByID([]string{"1592725891", "783214"})
 
-	expectedUsers := &[]twitter.User{
+	expectedUsers := &[]User{
 		{
 			ID:       "1592725891",
 			Name:     "elfo.go",
@@ -43,10 +42,10 @@ func TestGetMultipleUsersByID(t *testing.T) {
 }
 
 func TestGetSingleUserByUsername(t *testing.T) {
-	twitterClient := twitter.NewTwitterApi(BEARER_TOKEN)
-	user, err := twitterClient.GetSingleUserByUsername("velfo")
+	twitterClient := NewClient(BEARER_TOKEN)
+	user, err := twitterClient.GetSingleUserByUsername("velfo", QueryParams{})
 
-	expectedUser := &twitter.User{
+	expectedUser := &User{
 		ID:       "1592725891",
 		Name:     "elfo.go",
 		Username: "velfo",
@@ -57,10 +56,10 @@ func TestGetSingleUserByUsername(t *testing.T) {
 }
 
 func TestGetMultipleUsersByUsername(t *testing.T) {
-	twitterClient := twitter.NewTwitterApi(BEARER_TOKEN)
+	twitterClient := NewClient(BEARER_TOKEN)
 	users, err := twitterClient.GetMultipleUsersByUsername([]string{"velfo", "Twitter"})
 
-	expectedUsers := &[]twitter.User{
+	expectedUsers := &[]User{
 		{
 			ID:       "1592725891",
 			Name:     "elfo.go",

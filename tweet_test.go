@@ -1,17 +1,16 @@
-package twitter_test
+package twitter
 
 import (
-	"go-twitter-api-v2/twitter"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetSingleTweet(t *testing.T) {
-	twitterClient := twitter.NewTwitterApi(BEARER_TOKEN)
+	twitterClient := NewClient(BEARER_TOKEN)
 	tweet, err := twitterClient.GetSingleTweet("1400935254244966406")
 
-	expectedTweet := &twitter.Tweet{
+	expectedTweet := &Tweet{
 		ID:   "1400935254244966406",
 		Text: "Publiquei meu primeiro artigo no Medium, quem puder dar aquela olhada e deixar aquele feedback humilde, agradeço demais: \n\n\"Otimizando tamanho em memória de Structs em Golang\" \nhttps://t.co/9dWmVzWbyi",
 	}
@@ -22,10 +21,10 @@ func TestGetSingleTweet(t *testing.T) {
 }
 
 func TestGetMultipleTweets(t *testing.T) {
-	twitterClient := twitter.NewTwitterApi(BEARER_TOKEN)
+	twitterClient := NewClient(BEARER_TOKEN)
 	tweets, err := twitterClient.GetMultipleTweets([]string{"1400935254244966406", "1293595870563381249"})
 
-	expectedTweets := &[]twitter.Tweet{
+	expectedTweets := &[]Tweet{
 		{
 			ID:   "1400935254244966406",
 			Text: "Publiquei meu primeiro artigo no Medium, quem puder dar aquela olhada e deixar aquele feedback humilde, agradeço demais: \n\n\"Otimizando tamanho em memória de Structs em Golang\" \nhttps://t.co/9dWmVzWbyi",

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"time"
 )
@@ -67,12 +66,6 @@ type ReferencedTweet struct {
 	Type string
 }
 
-type image struct {
-	URL    string
-	Width  int
-	Height int
-}
-
 type attachments struct {
 	PollIDs   []string
 	MediaKeys []string
@@ -92,27 +85,33 @@ func (c *Client) GetSingleTweet(tweetID string) (*Tweet, error) {
 	var singleTweetResponse singleTweetResponse
 
 	if tweetID == "" {
-		return &singleTweetResponse.Data.Tweet, errors.New("no tweet id identified on tweetID params in GetSingleTweet().")
+		return nil, errors.New("no tweet id identified on tweetID params in GetSingleTweet()")
 	}
 
 	req, err := http.NewRequest(http.MethodGet, c.BasePath+c.Tweet.path+"/"+tweetID, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	req.Header.Add("Authorization", c.BearerToken)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("request single tweet failed: ", err)
-		return &singleTweetResponse.Data.Tweet, err
+		return nil, err
 	}
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println("reading body single tweet failed: ", err)
-		return &singleTweetResponse.Data.Tweet, err
+		return nil, err
 	}
 
-	json.Unmarshal(body, &singleTweetResponse)
+	err = json.Unmarshal(body, &singleTweetResponse)
+	if err != nil {
+		return nil, err
+	}
+
 	return &singleTweetResponse.Data.Tweet, nil
 }
 
@@ -120,7 +119,7 @@ func (c *Client) GetMultipleTweets(tweetIDs []string) (*[]Tweet, error) {
 	var tweets []Tweet
 
 	if len(tweetIDs) <= 0 {
-		return &tweets, errors.New("no tweet ids identified on tweetIDs params in GetMultipleTweets()")
+		return nil, errors.New("no tweet ids identified on tweetIDs params in GetMultipleTweets()")
 	}
 
 	var tweetIDsQuery = "?ids="
@@ -133,27 +132,31 @@ func (c *Client) GetMultipleTweets(tweetIDs []string) (*[]Tweet, error) {
 	}
 
 	req, err := http.NewRequest(http.MethodGet, c.BasePath+c.Tweet.path+tweetIDsQuery, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	req.Header.Add("Authorization", c.BearerToken)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("request multiple tweets failed: ", err)
-		return &tweets, err
+		return nil, err
 	}
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println("reading body multiple tweets failed: ", err)
-		return &tweets, err
+		return nil, err
 	}
 
 	var multipleTweetsResponse MultipleTweetsResponse
-	json.Unmarshal(body, &multipleTweetsResponse)
-
-	for _, tweet := range multipleTweetsResponse.Data {
-		tweets = append(tweets, tweet)
+	err = json.Unmarshal(body, &multipleTweetsResponse)
+	if err != nil {
+		return nil, err
 	}
+
+	tweets = append(tweets, multipleTweetsResponse.Data...)
+
 	return &tweets, nil
 }

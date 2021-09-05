@@ -11,7 +11,7 @@ type Client struct {
 	BearerToken string
 }
 
-func NewTwitterApi(bearerToken string) *Client {
+func NewClient(bearerToken string) *Client {
 	return &Client{
 		Tweet:  NewTweetService(),
 		User:   NewUserService(),

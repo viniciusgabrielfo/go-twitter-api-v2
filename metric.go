@@ -25,8 +25,12 @@ type PromotedMetrics struct {
 }
 
 type PublicMetrics struct {
-	RetweetCount int
-	ReplyCount   int
-	LikeCount    int
-	QuoteCount   int
+	FollowersCount int `json:"followers_count"`
+	FollowingCount int `json:"following_count"`
+	TweetCount     int `json:"tweet_count"`
+	ListedCount    int `json:"listed_account"`
+	RetweetCount   int
+	ReplyCount     int
+	LikeCount      int
+	QuoteCount     int
 }

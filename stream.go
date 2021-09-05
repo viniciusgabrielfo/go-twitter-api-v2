@@ -34,6 +34,10 @@ func (c *Client) GetFilteredStreamTweets(tweetsChan chan<- FilteredStreamTweet) 
 
 	// TODO: ass backfill_minutes param to request
 	req, err := http.NewRequest(http.MethodGet, c.Stream.path, nil)
+	if err != nil {
+		return
+	}
+
 	req.Header.Add("Authorization", c.BearerToken)
 
 	client := &http.Client{}

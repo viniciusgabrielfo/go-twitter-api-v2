@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"time"
 )
@@ -56,32 +55,37 @@ func NewUserService() *userService {
 	}
 }
 
-func (c *Client) GetSingleUserByID(userID string) (*User, error) {
-	var user User
-
+func (c *Client) GetSingleUserByID(userID string, params QueryParams) (*User, error) {
 	if userID == "" {
-		return &user, errors.New("no userID identified on in GetSingleUserByID().")
+		return nil, errors.New("no userID identified on in GetSingleUserByID()")
 	}
 
 	req, err := http.NewRequest(http.MethodGet, c.BasePath+c.User.path+"/"+userID, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	req.Header.Add("Authorization", c.BearerToken)
+
+	c.getQueryParamsRawQuery(req, params)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("request single user failed: ", err)
-		return &user, err
+		return nil, err
 	}
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println("reading body single user failed: ", err)
-		return &user, err
+		return nil, err
 	}
 
 	var userResponse singleUserResponse
 	json.Unmarshal(body, &userResponse)
+	if err != nil {
+		return nil, err
+	}
 
 	return &userResponse.Data, nil
 }
@@ -90,7 +94,7 @@ func (c *Client) GetMultipleUsersByID(usersID []string) (*[]User, error) {
 	var users []User
 
 	if len(usersID) <= 0 {
-		return &users, errors.New("no usersID identified on in GetMultipleUserByID().")
+		return &users, errors.New("no usersID identified on in GetMultipleUserByID()")
 	}
 
 	var userIDsQuery = "?ids="
@@ -103,58 +107,66 @@ func (c *Client) GetMultipleUsersByID(usersID []string) (*[]User, error) {
 	}
 
 	req, err := http.NewRequest(http.MethodGet, c.BasePath+c.User.path+userIDsQuery, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	req.Header.Add("Authorization", c.BearerToken)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("request multiple users failed: ", err)
 		return &users, err
 	}
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println("reading body multiple users failed: ", err)
 		return &users, err
 	}
 
 	var userResponse multipleUsersResponse
 	json.Unmarshal(body, &userResponse)
-
-	for _, user := range userResponse.Data {
-		users = append(users, user)
+	if err != nil {
+		return nil, err
 	}
+
+	users = append(users, userResponse.Data...)
 
 	return &users, nil
 }
 
-func (c *Client) GetSingleUserByUsername(username string) (*User, error) {
-	var user User
-
+func (c *Client) GetSingleUserByUsername(username string, params QueryParams) (*User, error) {
 	if username == "" {
-		return &user, errors.New("no username identified on in GetSingleUserByUsername().")
+		return nil, errors.New("no username identified on in GetSingleUserByUsername()")
 	}
 
 	req, err := http.NewRequest(http.MethodGet, c.BasePath+c.User.path+"/by/username/"+username, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	req.Header.Add("Authorization", c.BearerToken)
+
+	c.getQueryParamsRawQuery(req, params)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("request single user failed: ", err)
-		return &user, err
+		return nil, err
 	}
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println("reading body single user failed: ", err)
-		return &user, err
+		return nil, err
 	}
 
 	var userResponse singleUserResponse
 	json.Unmarshal(body, &userResponse)
+	if err != nil {
+		return nil, err
+	}
 
 	return &userResponse.Data, nil
 }
@@ -163,7 +175,7 @@ func (c *Client) GetMultipleUsersByUsername(usernames []string) (*[]User, error)
 	var users []User
 
 	if len(usernames) <= 0 {
-		return &users, errors.New("no usersID identified on in GetMultipleUserByID().")
+		return &users, errors.New("no usersID identified on in GetMultipleUserByID()")
 	}
 
 	var usernamesQuery = "?usernames="
@@ -176,28 +188,31 @@ func (c *Client) GetMultipleUsersByUsername(usernames []string) (*[]User, error)
 	}
 
 	req, err := http.NewRequest(http.MethodGet, c.BasePath+c.User.path+"/by"+usernamesQuery, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	req.Header.Add("Authorization", c.BearerToken)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("request multiple users failed: ", err)
 		return &users, err
 	}
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println("reading body multiple users failed: ", err)
 		return &users, err
 	}
 
 	var userResponse multipleUsersResponse
 	json.Unmarshal(body, &userResponse)
-
-	for _, user := range userResponse.Data {
-		users = append(users, user)
+	if err != nil {
+		return nil, err
 	}
+
+	users = append(users, userResponse.Data...)
 
 	return &users, nil
 }
