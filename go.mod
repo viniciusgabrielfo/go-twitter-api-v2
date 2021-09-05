@@ -1,4 +1,4 @@
-module github.com/go-twitter-api-v2
+module github.com/viniciusgabrielfo/go-twitter-api-v2
 
 go 1.15
 
